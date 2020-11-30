@@ -80,7 +80,7 @@ def sum_liklihoods(mus, sigmas, alphas, xs):
 
         # Loop through the parameter lists and calculate the probability for each set of parameters
         # Then multiply the probability by alpha and sum
-        for i in range(0, len(mus), 1):
+        for i in range(0, len(mus)):
             local_probability += (alphas[i] * prob_x_given_theta(np.float(x), mus[i], sigmas[i]))
             #print("For i=" + str(i) + " Added local probability " + str((alphas[i] * prob_x_given_theta(np.float(x), mus[i], sigmas[i]))))
 

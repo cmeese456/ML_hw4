@@ -1,5 +1,10 @@
 import numpy as np
 
+def prepare_data():
+    data_file = open("em_data.txt","r")
+    xs = data_file.readlines()
+    return xs
+
 def prob_x_given_theta(x, mu, sigma):
     probability = (1/(sigma * np.sqrt(2 * np.pi))) * np.exp((-1/2 * (x - mu)**2)/(sigma**2))
     return probability
@@ -60,9 +65,16 @@ def init(k):
             alpha_remaining = alpha_remaining - alpha
     return mus, sigmas, alphas
 
-with open("em_data.txt","r") as data_file:
-    k = 2
-    xs = data_file.readlines()
+# Function to perform step 2 of the experiment
+# After we have learned the parameters, run through the dataset
+# And compute the summed log-liklihoods
+def sum_liklihoods(mus, sigmas, alphas, xs):
+    return ""
+
+
+
+
+def driver(k, xs):
     mus, sigmas, alphas = init(k)
     tol = 0.001
     converged = False
@@ -89,3 +101,33 @@ with open("em_data.txt","r") as data_file:
             prev_alphas = alphas
             prev_sigmas = sigmas
         print("mus:" + str(mus) + ", sigmas: " + str(sigmas) + ", alphas: " + str(alphas))
+    return mus, sigmas, alphas
+
+def run_experiment():
+    xs = prepare_data()
+    # STEP 2:
+    # Run the  initial experiment for K=1
+    print("~~~~~~~~~~~~BEGIN k=1~~~~~~~~~~~~~")
+    mus_1, sigmas_1, alphas_1 = driver(1, xs)
+    print("FINAL MUS:" + str(mus_1) + ", FINAL SIGMAS: " + str(sigmas_1) + ", FINAL ALPHAS: " + str(alphas_1))
+
+    # Compute the log liklihoods using the computed parameters
+    sum_liklihoods(mus_1, sigmas_1, alphas_1, xs)
+    print("\n ~~~~~~~~~~END k=1~~~~~~~~~~~~~ \n\n\n\n")
+
+    # Run the initial experiment for K=3
+    print("~~~~~~~~~~~~BEGIN k=3~~~~~~~~~~~~~")
+    mus_3, sigmas_3, alphas_3 = driver(3, xs)
+    print("FINAL MUS:" + str(mus_3) + ", FINAL SIGMAS: " + str(sigmas_3) + ", FINAL ALPHAS: " + str(alphas_3))
+    print("\n ~~~~~~~~~~END k=3~~~~~~~~~~~~~ \n\n\n\n")
+
+    # Run the initial experiment for K=5
+    print("~~~~~~~~~~~~BEGIN k=5~~~~~~~~~~~~~")
+    mus_5, sigmas_5, alphas_5 = driver(5, xs)
+    print("FINAL MUS:" + str(mus_5) + ", FINAL SIGMAS: " + str(sigmas_5) + ", FINAL ALPHAS: " + str(alphas_5))
+    print("\n ~~~~~~~~~~END k=5~~~~~~~~~~~~~ \n\n\n\n")
+
+    return ""
+
+# Call functions here
+run_experiment()

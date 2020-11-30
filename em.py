@@ -1,4 +1,5 @@
 import numpy as np
+import math
 
 def prepare_data():
     data_file = open("em_data.txt","r")
@@ -69,9 +70,46 @@ def init(k):
 # After we have learned the parameters, run through the dataset
 # And compute the summed log-liklihoods
 def sum_liklihoods(mus, sigmas, alphas, xs):
-    return ""
+    # Initialize a log liklihood sum variable
+    summed_log_x = 0.0
 
+    # Compute the log likihood for each x value
+    for x in xs:
+        # Compute the probability for each set of parameters
+        local_probability = 0.0
 
+        # Loop through the parameter lists and calculate the probability for each set of parameters
+        # Then multiply the probability by alpha and sum
+        for i in range(0, len(mus), 1):
+            local_probability += (alphas[i] * prob_x_given_theta(np.float(x), mus[i], sigmas[i]))
+            #print("For i=" + str(i) + " Added local probability " + str((alphas[i] * prob_x_given_theta(np.float(x), mus[i], sigmas[i]))))
+
+        # Finally take the log of the summed probability
+        summed_log_x += math.log(local_probability)
+        #print("For xs=" + str(xs) + " Added local probability " + str(math.log(local_probability)))
+
+    return summed_log_x
+
+def sum_liklihoods_nolog(mus, sigmas, alphas, xs):
+    # Initialize a log liklihood sum variable
+    summed_log_x = 0.0
+
+    # Compute the log likihood for each x value
+    for x in xs:
+        # Compute the probability for each set of parameters
+        local_probability = 0.0
+
+        # Loop through the parameter lists and calculate the probability for each set of parameters
+        # Then multiply the probability by alpha and sum
+        for i in range(0, len(mus), 1):
+            local_probability += (alphas[i] * prob_x_given_theta(np.float(x), mus[i], sigmas[i]))
+            #print("For i=" + str(i) + " Added local probability " + str((alphas[i] * prob_x_given_theta(np.float(x), mus[i], sigmas[i]))))
+
+        # Finally take the log of the summed probability
+        summed_log_x += math.log(local_probability)
+        #print("For xs=" + str(xs) + " Added local probability " + str(math.log(local_probability)))
+
+    return summed_log_x
 
 
 def driver(k, xs):
@@ -112,22 +150,32 @@ def run_experiment():
     print("FINAL MUS:" + str(mus_1) + ", FINAL SIGMAS: " + str(sigmas_1) + ", FINAL ALPHAS: " + str(alphas_1))
 
     # Compute the log liklihoods using the computed parameters
-    sum_liklihoods(mus_1, sigmas_1, alphas_1, xs)
+    log_liklihood_1 = sum_liklihoods(mus_1, sigmas_1, alphas_1, xs)
+    print("\n FINAL SUMMED PROBABILITY: " + str(log_liklihood_1))
     print("\n ~~~~~~~~~~END k=1~~~~~~~~~~~~~ \n\n\n\n")
 
     # Run the initial experiment for K=3
     print("~~~~~~~~~~~~BEGIN k=3~~~~~~~~~~~~~")
     mus_3, sigmas_3, alphas_3 = driver(3, xs)
     print("FINAL MUS:" + str(mus_3) + ", FINAL SIGMAS: " + str(sigmas_3) + ", FINAL ALPHAS: " + str(alphas_3))
+
+    # Compute the log liklihoods using the computed parameters
+    log_liklihood_3 = sum_liklihoods(mus_3, sigmas_3, alphas_3, xs)
+    print("\n FINAL SUMMED PROBABILITY: " + str(log_liklihood_3))
     print("\n ~~~~~~~~~~END k=3~~~~~~~~~~~~~ \n\n\n\n")
 
     # Run the initial experiment for K=5
     print("~~~~~~~~~~~~BEGIN k=5~~~~~~~~~~~~~")
     mus_5, sigmas_5, alphas_5 = driver(5, xs)
     print("FINAL MUS:" + str(mus_5) + ", FINAL SIGMAS: " + str(sigmas_5) + ", FINAL ALPHAS: " + str(alphas_5))
+
+    # Compute the log liklihoods using the computed parameters
+    log_liklihood_5 = sum_liklihoods(mus_5, sigmas_5, alphas_5, xs)
+    print("\n FINAL SUMMED PROBABILITY: " + str(log_liklihood_5))
     print("\n ~~~~~~~~~~END k=5~~~~~~~~~~~~~ \n\n\n\n")
 
     return ""
 
 # Call functions here
 run_experiment()
+

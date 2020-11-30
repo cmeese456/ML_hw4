@@ -106,7 +106,7 @@ def sum_liklihoods_nolog(mus, sigmas, alphas, xs):
             #print("For i=" + str(i) + " Added local probability " + str((alphas[i] * prob_x_given_theta(np.float(x), mus[i], sigmas[i]))))
 
         # Finally take the log of the summed probability
-        summed_log_x += math.log(local_probability)
+        summed_log_x *= local_probability
         #print("For xs=" + str(xs) + " Added local probability " + str(math.log(local_probability)))
 
     return summed_log_x

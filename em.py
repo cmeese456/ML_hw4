@@ -1,4 +1,6 @@
 import numpy as np
+from datetime import datetime
+import sys
 
 def prepare_data():
     data_file = open("em_data.txt","r")
@@ -131,11 +133,14 @@ def driver(k, xs, fixed_sigma):
     prev_sigmas = sigmas
     prev_alphas = alphas
     prev_params = prev_mus + prev_sigmas + prev_alphas
+    iter = 0
     while (not converged):
         w = e_step(xs, mus, sigmas, alphas)
         mus, sigmas, alphas = m_step(xs, w, fixed_sigma)
         distance = get_distance(prev_mus, mus, prev_sigmas, sigmas, prev_alphas, alphas)
-        print("distance from previous: " + str(distance))
+        print()
+        print("ITERATION:              {}".format(str(iter)))
+        print("DISTANCE FROM PREVIOUS: {}".format(str(distance)))
         if (distance < tol):
             converged = True
             break
@@ -143,44 +148,50 @@ def driver(k, xs, fixed_sigma):
             prev_mus = mus
             prev_alphas = alphas
             prev_sigmas = sigmas
-        print("mus:" + str(mus) + ", sigmas: " + str(sigmas) + ", alphas: " + str(alphas))
-    return mus, sigmas, alphas
+            iter += 1
+        print("MUS:                    {}".format(str(mus)))
+        print("SIGMAS:                 {}".format(str(sigmas)))
+        print("ALPHAS:                 {}".format(str(alphas)))
+    return mus, sigmas, alphas, iter
 
 def run_experiment(fixed_sigma=None):
     xs = prepare_data()
-    # STEP 2:
-    # Run the  initial experiment for K=1
-    print("~~~~~~~~~~~~BEGIN k=1~~~~~~~~~~~~~")
-    mus_1, sigmas_1, alphas_1 = driver(1, xs, fixed_sigma)
-    print("FINAL MUS:" + str(mus_1) + ", FINAL SIGMAS: " + str(sigmas_1) + ", FINAL ALPHAS: " + str(alphas_1))
+    with open("log.{}.out".format(datetime.now().strftime('%y%m%d%H%M%S')),"a") as logfile:
+        # STEP 2:
+        # Run the  initial experiment for K=1, 3, and 5
+        for k in [1, 3, 5]:
+            header = "~~~~~~~~~~~~BEGIN k={}~~~~~~~~~~~~~".format(k)
+            if (fixed_sigma):
+                header  += "\nSIGMA FIXED AT:         {}".format(fixed_sigma)
+            print(header)
+            start_time = datetime.now().timestamp()
+            mus, sigmas, alphas, iters = driver(k, xs, fixed_sigma)
+            end_time = datetime.now().timestamp()
+            elapsed = end_time - start_time
+            iter_info   = "ITERATIONS TO CONVERGE: {}".format(iters)
+            time_info   = "TIME TO CONVERGE:       {} seconds".format(elapsed)
+            mus_info    = "FINAL MUS:              {}".format(mus)
+            sigmas_info = "FINAL SIGMAS:           {}".format(sigmas)
+            alphas_info = "FINAL ALPHAS:           {}".format(alphas)
+            print()
+            print(iter_info)
+            print(mus_info)
+            print(sigmas_info)
+            print(alphas_info)
 
-    # Compute the log likelihoods using the computed parameters
-    log_liklihood_1 = sum_likelihoods(mus_1, sigmas_1, alphas_1, xs)
-    print("\n LOG LIKELIHOOD FOR DATASET: " + str(log_liklihood_1))
-    print("\n ~~~~~~~~~~END k=1~~~~~~~~~~~~~ \n\n\n\n")
-
-    # Run the initial experiment for K=3
-    print("~~~~~~~~~~~~BEGIN k=3~~~~~~~~~~~~~")
-    mus_3, sigmas_3, alphas_3 = driver(3, xs, fixed_sigma)
-    print("FINAL MUS:" + str(mus_3) + ", FINAL SIGMAS: " + str(sigmas_3) + ", FINAL ALPHAS: " + str(alphas_3))
-
-    # Compute the log likelihoods using the computed parameters
-    log_liklihood_3 = sum_likelihoods(mus_3, sigmas_3, alphas_3, xs)
-    print("\n LOG LIKELIHOOD FOR DATASET: " + str(log_liklihood_3))
-    print("\n ~~~~~~~~~~END k=3~~~~~~~~~~~~~ \n\n\n\n")
-
-    # Run the initial experiment for K=5
-    print("~~~~~~~~~~~~BEGIN k=5~~~~~~~~~~~~~")
-    mus_5, sigmas_5, alphas_5 = driver(5, xs, fixed_sigma)
-    print("FINAL MUS:" + str(mus_5) + ", FINAL SIGMAS: " + str(sigmas_5) + ", FINAL ALPHAS: " + str(alphas_5))
-
-    # Compute the log likelihoods using the computed parameters
-    log_liklihood_5 = sum_likelihoods(mus_5, sigmas_5, alphas_5, xs)
-    print("\n LOG LIKELIHOOD FOR DATASET: " + str(log_liklihood_5))
-    print("\n ~~~~~~~~~~END k=5~~~~~~~~~~~~~ \n\n\n\n")
-
+            # Compute the log likelihoods using the computed parameters
+            log_likelihood = sum_likelihoods(mus, sigmas, alphas, xs)
+            likelihood_info = "LOG LIKELIHOOD FOR DATASET: {}".format(log_likelihood)
+            footer = "~~~~~~~~~~~~END k={}~~~~~~~~~~~~~~~".format(k)
+            print(likelihood_info)
+            print(footer)
+            print()
+            for str in [header, mus_info, sigmas_info, alphas_info, likelihood_info, iter_info, time_info, footer]:
+                logfile.write(str)
+                logfile.write("\n")
+    logfile.close()
     return ""
 
 # Call functions here
-run_experiment(fixed_sigma=1.0)
 run_experiment()
+run_experiment(fixed_sigma=1.0)

@@ -79,6 +79,22 @@ def init(k):
             alpha_remaining = alpha_remaining - alpha
     return mus, sigmas, alphas
 
+def one_over_k_init(k):
+    np.random.seed(0)
+    mu_init_max = 25.0
+    mu_init_min = 5.0
+    sigma_init_max = 1.0
+    sigma_init_min = 1.0
+    mus = []
+    sigmas = []
+    alphas = []
+    alpha_remaining = (1.0/k)
+    for i in range(k):
+        mus.append(np.random.uniform(mu_init_min, mu_init_max))
+        sigmas.append(np.random.uniform(sigma_init_min, sigma_init_max))
+        alphas.append(alpha_remaining)
+    return mus, sigmas, alphas
+
 # Function to perform step 2 of the experiment
 # After we have learned the parameters, run through the dataset
 # And compute the summed log-likelihoods

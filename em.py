@@ -62,8 +62,8 @@ def init(k):
     np.random.seed(0)
     mu_init_max = 25.0
     mu_init_min = 5.0
-    sigma_init_max = 1.0
-    sigma_init_min = 1.0
+    sigma_init_max = 1.00
+    sigma_init_min = 1.00
     mus = []
     sigmas = []
     alphas = []
